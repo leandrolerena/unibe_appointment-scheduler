@@ -1,13 +1,20 @@
+from typing import List
+
 import cvxpy as cp
 import numpy as np
 
 from problems.ProblemBuilder import ProblemBuilder
 
+TimePreferences = tuple[int, int]
+Gamma = int
+UserPreferences = tuple[TimePreferences, Gamma]
+
 
 class AppointmentMultiStation(ProblemBuilder):
-    def __init__(self, n_stations, n_persons):
+    def __init__(self, n_stations, users: List[UserPreferences]):
         self.K = n_stations
-        self.N = n_persons
+        self.N = len(users)
+        self.preferences = users
 
     def compile_problem(self) -> cp.Problem:
         N = self.N
@@ -43,13 +50,22 @@ class AppointmentMultiStation(ProblemBuilder):
 
         b_diagonal = [b_per_user[i][k][k] == 0 for k in range(K) for i in range(N)]
 
-        one_user_per_spot_in_queue = [cp.sum([x_per_user[i][j][k] for i in range(N)]) == 1 for j in range(N) for k in range(K)]
-        user_enqueued_once_in_queue = [cp.sum([x_per_user[i][j][k] for j in range(N)]) == 1 for i in range(N) for k in range(K)]
+        one_user_per_spot_in_queue = [cp.sum([x_per_user[i][j][k] for i in range(N)]) == 1 for j in range(N) for k in
+                                      range(K)]
+        user_enqueued_once_in_queue = [cp.sum([x_per_user[i][j][k] for j in range(N)]) == 1 for i in range(N) for k in
+                                       range(K)]
 
         c_positive = [c >= np.zeros(c.shape) for c in c_per_user]
 
-        c_penalty_to_early = []
-        c_penalty_to_late = []
+        c_penalty_to_early = [c_per_user[i][j][k] >= self.preferences[i][0][0] - s_per_queue[k][j] - M * (1 - x_per_user[i][j][k])
+                              for i in range(N)
+                              for j in range(N)
+                              for k in range(K)]
+
+        c_penalty_to_late =  [c_per_user[i][j][k] >= s_per_queue[k][j] + t_k - self.preferences[i][0][1] - M * (1 - x_per_user[i][j][k])
+                              for i in range(N)
+                              for j in range(N)
+                              for k in range(K)]
 
         # objective
         obj = cp.Minimize(sum([cp.sum(c) for c in c_per_user]))
@@ -62,6 +78,9 @@ class AppointmentMultiStation(ProblemBuilder):
         constraints.extend(one_user_per_spot_in_queue)
         constraints.extend(user_enqueued_once_in_queue)
         constraints.extend(c_positive)
+        constraints.extend(c_penalty_to_early)
+        constraints.extend(c_penalty_to_late)
 
         prob = cp.Problem(obj, constraints)
+
         return prob
