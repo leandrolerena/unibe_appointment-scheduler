@@ -3,7 +3,7 @@ from abc import abstractmethod
 import cvxpy as cp
 import numpy as np
 
-class ProblemBuilder:
+class AppointmentProblem:
     @abstractmethod
-    def compile_problem(self) -> cp.Problem:
+    def compile_and_solve(self) -> cp.Problem:
         pass

@@ -3,20 +3,23 @@ from typing import List
 import cvxpy as cp
 import numpy as np
 
-from problems.ProblemBuilder import ProblemBuilder
+from entities.queue import Queue
+from entities.user import User
+from problems.AppointmentProblem import AppointmentProblem
 
 TimePreferences = tuple[int, int]
 Gamma = int
 UserPreferences = tuple[TimePreferences, Gamma]
 
 
-class AppointmentMultiStation(ProblemBuilder):
-    def __init__(self, n_stations, users: List[UserPreferences]):
-        self.K = n_stations
+class AppointmentMultiStation(AppointmentProblem):
+    def __init__(self, queues: List[Queue], users: List[User]):
+        self.K = len(queues)
         self.N = len(users)
-        self.preferences = users
+        self.users = users
+        self.queues = queues
 
-    def compile_problem(self) -> cp.Problem:
+    def compile_and_solve(self) -> cp.Problem:
         N = self.N
         K = self.K
         t_k = 10
@@ -57,12 +60,12 @@ class AppointmentMultiStation(ProblemBuilder):
 
         c_positive = [c >= np.zeros(c.shape) for c in c_per_user]
 
-        c_penalty_to_early = [c_per_user[i][j][k] >= self.preferences[i][0][0] - s_per_queue[k][j] - M * (1 - x_per_user[i][j][k])
+        c_penalty_to_early = [c_per_user[i][j][k] >= self.users[i].earliest - s_per_queue[k][j] - M * (1 - x_per_user[i][j][k])
                               for i in range(N)
                               for j in range(N)
                               for k in range(K)]
 
-        c_penalty_to_late =  [c_per_user[i][j][k] >= s_per_queue[k][j] + t_k - self.preferences[i][0][1] - M * (1 - x_per_user[i][j][k])
+        c_penalty_to_late =  [c_per_user[i][j][k] >= s_per_queue[k][j] + t_k - self.users[i].latest - M * (1 - x_per_user[i][j][k])
                               for i in range(N)
                               for j in range(N)
                               for k in range(K)]
@@ -82,5 +85,9 @@ class AppointmentMultiStation(ProblemBuilder):
         constraints.extend(c_penalty_to_late)
 
         prob = cp.Problem(obj, constraints)
+
+        # Solve with SciPy/HiGHS.
+        prob.solve(solver=cp.SCIPY, scipy_options={"method": "highs"})
+        print("optimal value with SciPy/HiGHS:", prob.value)
 
         return prob
