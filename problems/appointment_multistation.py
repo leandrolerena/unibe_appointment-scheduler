@@ -90,4 +90,13 @@ class AppointmentMultiStation(AppointmentProblem):
         prob.solve(solver=cp.SCIPY, scipy_options={"method": "highs"})
         print("optimal value with SciPy/HiGHS:", prob.value)
 
+        for i in range(N):
+            for k in range(K):
+                for j in range(N):
+                    if x_per_user[i].value[j][k] == 1:
+                        print(f"User {i} visists queue {k} at {s_per_queue[k].value[j]}")
+
+        # TODO: Put results in queue about ordering
+        # TODO: Put cost to user
+
         return prob
