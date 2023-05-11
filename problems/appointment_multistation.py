@@ -34,7 +34,7 @@ class AppointmentMultiStation(AppointmentProblem):
 
         # constraints
         no_queue_overlaps = [s_per_queue[k][j] + t_k <= s_per_queue[k][j + 1] for j in range(N - 1) for k in range(K)]
-        no_cross_queue_overlaps = [s_per_queue[k][j]
+        no_cross_queue_overlaps = [s_per_queue[k][j] + t_k
                                    <= s_per_queue[k_prime][j_prime] + M *
                                    (3 - x_per_user[i][j][k] - x_per_user[i][j_prime][k_prime] - b_per_user[i][k][
                                        k_prime])
