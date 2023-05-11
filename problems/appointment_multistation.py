@@ -39,8 +39,8 @@ class AppointmentMultiStation(AppointmentProblem):
                                    <= s_per_queue[k_prime][j_prime] + M *
                                    (3 - x_per_user[i][j][k] - x_per_user[i][j_prime][k_prime] - b_per_user[i][k][
                                        k_prime])
-                                   for j in range(N - 1)
-                                   for j_prime in range(N - 1)
+                                   for j in range(N)
+                                   for j_prime in range(N)
                                    for k in range(K)
                                    for k_prime in range(K)
                                    for i in range(N)
