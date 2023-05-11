@@ -18,6 +18,7 @@ class AppointmentMultiStation(AppointmentProblem):
         self.N = len(users)
         self.users = users
         self.queues = queues
+        # TODO: add queue opening time
 
     def compile_and_solve(self) -> cp.Problem:
         N = self.N
@@ -94,7 +95,7 @@ class AppointmentMultiStation(AppointmentProblem):
             for k in range(K):
                 for j in range(N):
                     if x_per_user[i].value[j][k] == 1:
-                        print(f"User {i} visists queue {k} at {s_per_queue[k].value[j]}")
+                        print(f"User {i} visists queue {k} at {'{:.2f}'.format(s_per_queue[k].value[j])} with cost {'{:.2f}'.format(c_per_user[i].value[j][k])}")
 
         # TODO: Put results in queue about ordering
         # TODO: Put cost to user
