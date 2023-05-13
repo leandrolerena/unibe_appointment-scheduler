@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 cvxpy = "*"
+matplotlib = "*"
 
 [dev-packages]
 
