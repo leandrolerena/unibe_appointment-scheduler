@@ -1,3 +1,4 @@
+import math
 import time
 from typing import List
 
@@ -113,9 +114,15 @@ class AppointmentMultiStation(AppointmentProblem):
         end = time.time()
         for i in range(N):
             for k in range(K):
+                assigned_to_spot = False
                 for j in range(N):
-                    if x_per_user[i].value[j][k] == 1:
+                    if math.isclose(x_per_user[i].value[j][k], 1):
+                        assigned_to_spot = True
                         print(f"User {i} visists queue {k} at {'{:.2f}'.format(s_per_queue[k].value[j])} with cost {'{:.2f}'.format(c_per_user[i].value[j][k])}")
+                if not assigned_to_spot:
+                    print(f"Infeasible, user {i} is not assigned to queue {k} (check rounding errors)")
+                    for j in range(N):
+                        print(f"x[{i}][{j}][{k}] = {x_per_user[i].value[j][k]}")
 
         print(f"Total time used: {end-start} seconds")
         # TODO: Put results in queue about ordering
