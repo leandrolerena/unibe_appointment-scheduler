@@ -11,29 +11,40 @@ if __name__ == '__main__':
     # queues: List[Queue] = [Queue(time_serving=10), Queue(time_serving=10), Queue(time_serving=10)]
     # users: List[User] = [User(earliest=0, latest=30), User(earliest=0, latest=100), User(earliest=0, latest=100)]
 
-    queues: List[Queue] = [Queue.random() for i in range(3)]
-    users: List[User] = [User.random() for i in range(3)]
+    queues: List[Queue] = [Queue.random() for i in range(5)]
+    users: List[User] = [User.random() for i in range(37)]
 
-    for user in users:
-        queue = queues[0]
-        req = QueueRequest(user, queue)
-        queue.add_request(req)
-        user.add_request(req)
+    # for user in users:
+    #     queue = queues[0]
+    #     req = QueueRequest(user, queue)
+    #     queue.add_request(req)
+    #     user.add_request(req)
+    #
+    # queue = queues[1]
+    # user = users[1]
+    # req = QueueRequest(users[1], queue)
+    # queue.add_request(req)
+    # user.add_request(req)
+    #
+    # queue = queues[2]
+    # user = users[2]
+    # req = QueueRequest(users[2], queue)
+    # queue.add_request(req)
+    # user.add_request(req)
 
-    queue = queues[1]
-    user = users[1]
-    req = QueueRequest(users[1], queue)
-    queue.add_request(req)
-    user.add_request(req)
+    i = 0
+    for queue in queues:
+        for user in users:
+            i = i + 1
+            if i % 4 == 0:
+                req = QueueRequest(user, queue)
+                queue.add_request(req)
+                user.add_request(req)
 
-    queue = queues[2]
-    user = users[2]
-    req = QueueRequest(users[2], queue)
-    queue.add_request(req)
-    user.add_request(req)
+    queues = [queue for queue in queues if len(queue.requests) > 0]
+    users = [user for user in users if len(user.requests) > 0]
 
     problem = AppointmentMultiStation(queues, users)
     problem.compile_and_solve()
 
-
-
+    # had 4 seconds for 35 users on 5 queues
