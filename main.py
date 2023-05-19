@@ -1,3 +1,4 @@
+import os
 from typing import List
 
 import cvxpy as cp
@@ -28,10 +29,14 @@ if __name__ == '__main__':
     problem = AppointmentMultiStation(problem_data)
     problem.compile_and_solve()
 
+    out_dir = f"out/{problem_data.scenario_name.strip().replace('/', '_').replace(' ', '_')}"
+    os.makedirs(out_dir, exist_ok=True)
+
     queue_plot = PlotQueuePerspective(problem_data)
-    queue_plot.plot_gnt()
+    queue_plot.plot_gnt(out_dir)
 
     user_plot = PlotUserPerspective(problem_data)
-    user_plot.plot_gnt()
+    user_plot.plot_gnt(out_dir)
+
 
     # had 4 seconds for 35 users on 5 queues

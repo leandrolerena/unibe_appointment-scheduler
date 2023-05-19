@@ -4,10 +4,13 @@ from entities.requesting import Queue, User
 
 
 class ProblemData:
-    def __init__(self, queues: List[Queue], users: List[User], scenario_name: str = "No Scenario Name"):
+    def __init__(self, queues: List[Queue], users: List[User], scenario_name: str = None):
         self.queues = queues
         self.users = users
         self.scenario_name = scenario_name
+
+        if self.scenario_name is None:
+            self.scenario_name = f"{len(self.queues)} Queues/{len(self.users)} Users"
 
     def process(self):
         print("Filter out users and queues with no requests")

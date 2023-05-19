@@ -10,10 +10,12 @@ class PlotQueuePerspective:
     def __init__(self, problem_data: ProblemData):
         self.problem_data = problem_data
 
-    def plot_gnt(self):
+    def plot_gnt(self, out_dir: str):
         colors = color_map(len(self.problem_data.users))
         # Declaring a figure "gnt"
         fig, gnt = plt.subplots()
+
+        fig.suptitle(f"Scenario: {self.problem_data.scenario_name} [Queue Perspective]", fontsize=14)
 
         # Setting Y-axis limits
         gnt.set_ylim(0, len(self.problem_data.queues) * 10)
@@ -39,11 +41,12 @@ class PlotQueuePerspective:
                                 (10 * queue.index, 9),
                                 facecolors=(colors[request.user_index]))
 
-        plt.savefig("queue_perspective.png")
+        plt.savefig(f"{out_dir}/queue_perspective.png")
 
 
 def rgb_to_hex(r, g, b):
     return '#{:02x}{:02x}{:02x}'.format(r, g, b)
+
 
 def color_map(size: int):
     colors = []
