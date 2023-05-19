@@ -174,8 +174,10 @@ class AppointmentMultiStation(AppointmentProblem):
                 request = queue.requests[i]
                 for j in range(len(queue.requests)):
                     if math.isclose(x_per_queue[k].value[i][j], 1):
+                        user = self.users[request.user_index]
                         print(
-                            f"User {request.user_index} visists queue {k} at {'{:.2f}'.format(s_per_queue[k].value[j])} until {'{:.2f}'.format(s_per_queue[k].value[j] + self.queues[k].time_serving)} with cost {'{:.2f}'.format(c_per_queue[k].value[i][j])}")
+                            f"User {user.index} visists queue {k} at {'{:.2f}'.format(s_per_queue[k].value[j])} until {'{:.2f}'.format(s_per_queue[k].value[j] + self.queues[k].time_serving)} with cost {'{:.2f}'.format(c_per_queue[k].value[i][j])}")
+
 
 
 
