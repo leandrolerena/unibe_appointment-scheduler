@@ -18,6 +18,7 @@ if __name__ == '__main__':
     for queue in queues:
         for user in users:
             i = i + 1
+            # Make it a bit "sparser" - not all users go to all queues
             if i % 4 == 0:
                 req = QueueRequest(user, queue)
 

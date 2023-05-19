@@ -10,6 +10,8 @@ class ProblemData:
         self.scenario_name = scenario_name
 
     def process(self):
+        print("Filter out users and queues with no requests")
+
         self.queues = [queue for queue in self.queues if len(queue.requests) > 0]
         self.users = [user for user in self.users if len(user.requests) > 0]
 
