@@ -50,5 +50,7 @@ class QueueRequest:
         self.user_index = None
         self.index_on_queue = None
         self.index_on_user = None
+        self.optimal_visiting_time = None
+        self.visiting_duration = None
         queue.add_request(self)
         user.add_request(self)

@@ -147,6 +147,8 @@ class AppointmentMultiStation(AppointmentProblem):
                         user = self.users[request.user_index]
                         print(
                             f"User {user.index} visists queue {k} at {'{:.2f}'.format(s_per_queue[k].value[j])} until {'{:.2f}'.format(s_per_queue[k].value[j] + self.queues[k].time_serving)} with cost {'{:.2f}'.format(c_per_queue[k].value[i][j])}")
+                        request.optimal_visiting_time = s_per_queue[k].value[j]
+                        request.visiting_duration = self.queues[k].time_serving
 
         print(f"Total time used: {end - start} seconds")
         # TODO: Put results in queue about ordering

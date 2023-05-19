@@ -4,9 +4,10 @@ from entities.requesting import Queue, User
 
 
 class ProblemData:
-    def __init__(self, queues: List[Queue], users: List[User]):
+    def __init__(self, queues: List[Queue], users: List[User], scenario_name: str = "No Scenario Name"):
         self.queues = queues
         self.users = users
+        self.scenario_name = scenario_name
 
     def process(self):
         self.queues = [queue for queue in self.queues if len(queue.requests) > 0]
