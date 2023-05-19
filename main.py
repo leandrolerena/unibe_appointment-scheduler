@@ -3,7 +3,8 @@ from typing import List
 import cvxpy as cp
 import numpy as np
 
-from entities.queue import Queue, QueueRequest, User
+from entities.problem_data import ProblemData
+from entities.requesting import Queue, QueueRequest, User
 from problems.appointment_multistation import AppointmentMultiStation
 from problems.highs_test import HighsTest
 
@@ -14,37 +15,17 @@ if __name__ == '__main__':
     queues: List[Queue] = [Queue.random() for i in range(5)]
     users: List[User] = [User.random() for i in range(37)]
 
-    # for user in users:
-    #     queue = queues[0]
-    #     req = QueueRequest(user, queue)
-    #     queue.add_request(req)
-    #     user.add_request(req)
-    #
-    # queue = queues[1]
-    # user = users[1]
-    # req = QueueRequest(users[1], queue)
-    # queue.add_request(req)
-    # user.add_request(req)
-    #
-    # queue = queues[2]
-    # user = users[2]
-    # req = QueueRequest(users[2], queue)
-    # queue.add_request(req)
-    # user.add_request(req)
-
     i = 0
     for queue in queues:
         for user in users:
             i = i + 1
             if i % 4 == 0:
                 req = QueueRequest(user, queue)
-                queue.add_request(req)
-                user.add_request(req)
 
-    queues = [queue for queue in queues if len(queue.requests) > 0]
-    users = [user for user in users if len(user.requests) > 0]
+    problem_data = ProblemData(queues, users)
+    problem_data.process()
 
-    problem = AppointmentMultiStation(queues, users)
+    problem = AppointmentMultiStation(problem_data)
     problem.compile_and_solve()
 
     # had 4 seconds for 35 users on 5 queues

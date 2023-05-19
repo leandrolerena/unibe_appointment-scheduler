@@ -5,7 +5,8 @@ from typing import List
 import cvxpy as cp
 import numpy as np
 
-from entities.queue import Queue, User
+from entities.problem_data import ProblemData
+from entities.requesting import Queue, User
 from problems.AppointmentProblem import AppointmentProblem
 
 TimePreferences = tuple[int, int]
@@ -14,45 +15,14 @@ UserPreferences = tuple[TimePreferences, Gamma]
 
 
 class AppointmentMultiStation(AppointmentProblem):
-    def __init__(self, queues: List[Queue], users: List[User], transitivity_elimination=False):
-        self.users: List[User] = users
-        self.queues: List[Queue] = queues
+    def __init__(self, problem_data: ProblemData, transitivity_elimination=False):
+        self.users: List[User] = problem_data.users
+        self.queues: List[Queue] = problem_data.queues
 
         self.transitivity_elimination = transitivity_elimination
         # TODO: add queue opening time
 
     def compile_and_solve(self) -> cp.Problem:
-
-        print("Determine indexes on queue for requests")
-
-        for k in range(len(self.queues)):
-            queue = self.queues[k]
-            queue.index = k
-            for request in queue.requests:
-                request.queue_index = k
-            for j in range(len(queue.requests)):
-                queue.requests[j].index_on_queue = j
-
-        print("Determine indexes on users for requests")
-
-        for i in range(len(self.users)):
-            user = self.users[i]
-            user.index = i
-            for request in user.requests:
-                request.user_index = i
-            for j in range(len(user.requests)):
-                user.requests[j].index_on_user = j
-
-        print("Determine Queue Index Mapping for User")
-        for queue in self.queues:
-            for request in queue.requests:
-                request.user.queue_index[queue.index] = request.index_on_queue
-
-        print("Determine User Index Mapping for Queue")
-        for user in self.users:
-            for request in user.requests:
-                request.queue.user_index[user.index] = request.index_on_user
-
         print("Constraints calculation")
         M = 19 * 60
 
@@ -129,11 +99,11 @@ class AppointmentMultiStation(AppointmentProblem):
             for k in range(len(self.queues))
             for i in range(len(self.queues[k].requests))
             for j in range(len(self.queues[k].requests))
-            ]
+        ]
 
         c_penalty_to_late = [
             c_per_queue[k][i][j] >= s_per_queue[k][j] + self.queues[k].time_serving - self.users[i].latest - M * (
-                        1 - x_per_queue[k][i][j])
+                    1 - x_per_queue[k][i][j])
             for k in range(len(self.queues))
             for i in range(len(self.queues[k].requests))
             for j in range(len(self.queues[k].requests))]
@@ -177,9 +147,6 @@ class AppointmentMultiStation(AppointmentProblem):
                         user = self.users[request.user_index]
                         print(
                             f"User {user.index} visists queue {k} at {'{:.2f}'.format(s_per_queue[k].value[j])} until {'{:.2f}'.format(s_per_queue[k].value[j] + self.queues[k].time_serving)} with cost {'{:.2f}'.format(c_per_queue[k].value[i][j])}")
-
-
-
 
         print(f"Total time used: {end - start} seconds")
         # TODO: Put results in queue about ordering
