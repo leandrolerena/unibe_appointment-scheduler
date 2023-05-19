@@ -12,7 +12,7 @@ from problems.highs_test import HighsTest
 
 if __name__ == '__main__':
     queues: List[Queue] = [Queue.random() for i in range(5)]
-    users: List[User] = [User.random() for i in range(20)]
+    users: List[User] = [User.random() for i in range(21)]
 
     i = 0
     for queue in queues:
