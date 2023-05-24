@@ -38,5 +38,19 @@ if __name__ == '__main__':
     user_plot = PlotUserPerspective(problem_data)
     user_plot.plot_gnt(out_dir)
 
+    # todo: stress test, check feasibility again
+
+    # todo: presentation: ideal scenario (good distribution
+    # todo: presentation: all on the same
+
+    # todo: queue -> "appointment scheduling"
+    # todo: overall setting, but in programm we can prune a lot of constraints
+    # todo: transitive in b variable
+
+    # todo: comment cvxpy (highs)
+    # todo: comment intuition
+
+
+    # todo: next steps
 
     # had 4 seconds for 35 users on 5 queues
