@@ -33,7 +33,8 @@ class User:
     @classmethod
     def random(cls) -> Self:
         earliest = random.randint(0, 500)
-        latest = earliest + random.randint(200, 500)
+        # latest = earliest + random.randint(200, 500)
+        latest = earliest
         return User(earliest, latest)
 
     def add_request(self, request: "QueueRequest"):
