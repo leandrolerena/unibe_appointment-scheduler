@@ -14,7 +14,7 @@ class PlotUserPerspective:
         colors = color_map(len(self.problem_data.queues))
         # Declaring a figure "gnt"
         fig, gnt = plt.subplots()
-        fig.suptitle(f"Scenario: {self.problem_data.scenario_name} [User Perspective]", fontsize=14)
+        fig.suptitle(f"Scenario: {self.problem_data.scenario_name} [User Perspective] ({'{:.2f}'.format(self.problem_data.solution_time)} s)", fontsize=14)
 
         # Setting Y-axis limits
         gnt.set_ylim(0, len(self.problem_data.users) * 10)

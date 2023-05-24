@@ -8,6 +8,8 @@ class ProblemData:
         self.queues = queues
         self.users = users
         self.scenario_name = scenario_name
+        self.solution_time = None
+        self.solution_cost = None
 
         if self.scenario_name is None:
             self.scenario_name = f"{len(self.queues)} Queues/{len(self.users)} Users"

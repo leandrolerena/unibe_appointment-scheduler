@@ -18,6 +18,7 @@ class AppointmentMultiStation(AppointmentProblem):
     def __init__(self, problem_data: ProblemData, transitivity_elimination=False):
         self.users: List[User] = problem_data.users
         self.queues: List[Queue] = problem_data.queues
+        self.problem_data = problem_data
 
         self.transitivity_elimination = transitivity_elimination
         # TODO: add queue opening time
@@ -151,6 +152,9 @@ class AppointmentMultiStation(AppointmentProblem):
                         request.visiting_duration = self.queues[k].time_serving
 
         print(f"Total time used: {end - start} seconds")
+        self.problem_data.solution_time = end - start
+        self.problem_data.solution_cost = prob.value
+
         # TODO: Put results in queue about ordering
         # TODO: Put cost to user
 
