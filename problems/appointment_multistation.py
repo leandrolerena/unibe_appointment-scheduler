@@ -95,14 +95,14 @@ class AppointmentMultiStation(AppointmentProblem):
         c_positive = [c >= np.zeros(c.shape) for c in c_per_queue]
 
         c_penalty_to_early = [
-            c_per_queue[k][i][j] >= self.users[i].earliest - s_per_queue[k][j] - M * (1 - x_per_queue[k][i][j])
+            c_per_queue[k][i][j] >= self.queues[k].requests[i].earliest - s_per_queue[k][j] - M * (1 - x_per_queue[k][i][j])
             for k in range(len(self.queues))
             for i in range(len(self.queues[k].requests))
             for j in range(len(self.queues[k].requests))
         ]
 
         c_penalty_to_late = [
-            c_per_queue[k][i][j] >= s_per_queue[k][j] + self.queues[k].time_serving - self.users[i].latest - M * (
+            c_per_queue[k][i][j] >= s_per_queue[k][j] + self.queues[k].time_serving - self.queues[k].requests[i].latest - M * (
                     1 - x_per_queue[k][i][j])
             for k in range(len(self.queues))
             for i in range(len(self.queues[k].requests))
