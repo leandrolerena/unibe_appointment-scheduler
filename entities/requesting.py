@@ -5,7 +5,7 @@ MAX_INT = 2 ** 32 - 1
 
 
 class Queue:
-    def __init__(self, time_serving: int = 10, opening: int = 8 * 60, closing: int = 18 * 60):
+    def __init__(self, time_serving: int = 10, opening: int = 0, closing: int = 1000):
         self.time_serving = time_serving
         self.requests: List[QueueRequest] = []
         self.index = None
