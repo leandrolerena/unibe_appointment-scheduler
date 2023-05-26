@@ -6,15 +6,15 @@ from problems.appointment_multistation import AppointmentMultiStation
 
 queues: List[Queue] = []
 users: List[User] = []
-queue_0 = Queue(7, 480, 1080)
+queue_0 = Queue(7, 0, 1000)
 queues.append(queue_0)
-queue_1 = Queue(24, 480, 1080)
+queue_1 = Queue(24, 0, 1000)
 queues.append(queue_1)
-queue_2 = Queue(25, 480, 1080)
+queue_2 = Queue(25, 0, 1000)
 queues.append(queue_2)
-queue_3 = Queue(6, 480, 1080)
+queue_3 = Queue(6, 0, 1000)
 queues.append(queue_3)
-queue_4 = Queue(20, 480, 1080)
+queue_4 = Queue(20, 0, 1000)
 queues.append(queue_4)
 user_0 = User(134,282)
 users.append(user_0)
