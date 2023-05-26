@@ -23,7 +23,7 @@ if __name__ == '__main__':
             if i % 4 == 0:
                 req = QueueRequest(user, queue)
 
-    problem_data = ProblemData(queues, users)
+    problem_data = ProblemData(queues, users, "Hello World")
     problem_data.process()
 
     problem = AppointmentMultiStation(problem_data)
@@ -32,11 +32,21 @@ if __name__ == '__main__':
     out_dir = f"out/{problem_data.scenario_name.strip().replace('/', '_').replace(' ', '_')}"
     os.makedirs(out_dir, exist_ok=True)
 
-    queue_plot = PlotQueuePerspective(problem_data)
-    queue_plot.plot_gnt(out_dir)
+    try:
+        queue_plot = PlotQueuePerspective(problem_data)
+        queue_plot.plot_gnt(out_dir)
 
-    user_plot = PlotUserPerspective(problem_data)
-    user_plot.plot_gnt(out_dir)
+        user_plot = PlotUserPerspective(problem_data)
+        user_plot.plot_gnt(out_dir)
+    except Exception as e:
+        print("Could not create plots")
+
+    problem_data.gen_code()
+
+    if problem_data.check_feasibility() == True:
+        print("Additional Feasibility Check passed")
+    else:
+        raise Exception("Problem is not feasible")
 
     # todo: stress test, check feasibility again
 
@@ -45,11 +55,9 @@ if __name__ == '__main__':
 
     # todo: queue -> "appointment scheduling"
     # todo: overall setting, but in programm we can prune a lot of constraints
-    # todo: transitive in b variable
 
-    # todo: comment cvxpy (highs)
-    # todo: comment intuition
-
+    # todo: for non-zero energy, search goes on -> no high config...
+    # todo: for zero energy, the problem is **much** faster
 
     # todo: next steps
 

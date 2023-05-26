@@ -1,6 +1,7 @@
+import math
 from typing import List
 
-from entities.requesting import Queue, User
+from entities.requesting import Queue, User, QueueRequest
 
 
 class ProblemData:
@@ -49,3 +50,45 @@ class ProblemData:
         for user in self.users:
             for request in user.requests:
                 request.queue.user_index[user.index] = request.index_on_user
+
+
+    def gen_code(self):
+        print("Code for the scenario")
+
+        print(f"queues: List[Queue] = []")
+        print(f"users: List[User] = []")
+        for queue in self.queues:
+            print(f"queue_{queue.index} = Queue({queue.time_serving}, {queue.opening}, {queue.closing})")
+            print(f"queues.append(queue_{queue.index})")
+
+        for user in self.users:
+            print(f"user_{user.index} = User({user.earliest},{user.latest})")
+            print(f"users.append(user_{user.index})")
+
+        for user in self.users:
+            for request in user.requests:
+                print(f"user_{user.index}_request_{request.index_on_user} = QueueRequest(user_{request.user.index}, "
+                      f"queue_{request.queue.index}, {request.earliest}, {request.latest})")
+
+        print(f"problem_data = ProblemData(queues, users, '{self.scenario_name}')")
+
+    def check_feasibility(self) -> bool:
+        for user in self.users:
+            request_time_sorted = sorted(user.requests, key=lambda req: req.optimal_visiting_time)
+            for j in range(len(request_time_sorted) - 1):
+                first = request_time_sorted[j]
+                second = request_time_sorted[j + 1]
+                if first.optimal_visiting_time + first.visiting_duration > second.optimal_visiting_time + 0.02:
+                    print(f"{first.optimal_visiting_time} + {first.visiting_duration} > {second.optimal_visiting_time}")
+                    return False
+
+        for queue in self.queues:
+            request_time_sorted = sorted(queue.requests, key=lambda req: req.optimal_visiting_time)
+            for j in range(len(request_time_sorted) - 1):
+                first = request_time_sorted[j]
+                second = request_time_sorted[j + 1]
+                if first.optimal_visiting_time + first.visiting_duration > second.optimal_visiting_time + 0.02:
+                    print(f"{first.optimal_visiting_time} + {first.visiting_duration} > {second.optimal_visiting_time}")
+                    return False
+
+        return True

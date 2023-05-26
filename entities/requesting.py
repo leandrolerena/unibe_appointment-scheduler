@@ -11,6 +11,8 @@ class Queue:
         self.index = None
         # Map from User Index to Queues Index on User
         self.user_index: Dict[int, int] = {}
+        self.opening = opening
+        self.closing = closing
 
     @classmethod
     def random(cls) -> Self:
