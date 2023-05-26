@@ -140,7 +140,9 @@ class AppointmentMultiStation(AppointmentProblem):
         print(f"processed {len(constraints)} constraints in {end - start} seconds")
         # Solve with SciPy/HiGHS.
         start = time.time()
-        prob.solve(solver=cp.SCIPY, scipy_options={"method": "highs"}, options={"maxiter": 100, "disp": True})
+        # passing args to highs is not supported
+        # prob.solve(solver=cp.SCIPY, scipy_options={"method": "highs"}, options={"maxiter": 100, "disp": True})
+        prob.solve(solver=cp.SCIPY, scipy_options={"method": "highs"})
         print("optimal value with SciPy/HiGHS:", prob.value)
         print(f"Problem status: {prob.status}")
 
