@@ -35,6 +35,11 @@ class AppointmentMultiStation(AppointmentProblem):
 
         s_per_queue = [cp.Variable(len(queue.requests)) for queue in self.queues]
 
+        spots_after_opening = [s_per_queue[k][0] >= self.queues[k].opening for k in
+                             range(len(self.queues))]
+
+        spots_before_closing = [s_per_queue[k][-1] + self.queues[k].time_serving <= self.queues[k].closing for k in
+                               range(len(self.queues))]
         # constraints
         no_queue_overlaps = [s_per_queue[k][j] + self.queues[k].time_serving <= s_per_queue[k][j + 1] for k in
                              range(len(self.queues)) for j in range(len(self.queues[k].requests) - 1)]
@@ -113,6 +118,8 @@ class AppointmentMultiStation(AppointmentProblem):
         obj = cp.Minimize(sum([cp.sum(c) for c in c_per_queue]))
 
         constraints = []
+        constraints.extend(spots_after_opening)
+        constraints.extend(spots_before_closing)
         constraints.extend(no_queue_overlaps)
         constraints.extend(no_cross_queue_overlaps)
         constraints.extend(b_symmetry)
