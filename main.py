@@ -23,7 +23,7 @@ if __name__ == '__main__':
             if i % 4 == 0:
                 req = QueueRequest(user, queue)
 
-    problem_data = ProblemData(queues, users, "Hello World")
+    problem_data = ProblemData(queues, users, "Test")
     problem_data.process()
 
     problem = AppointmentMultiStation(problem_data)
@@ -47,8 +47,6 @@ if __name__ == '__main__':
         print("Additional Feasibility Check passed")
     else:
         raise Exception("Problem is not feasible")
-
-    # todo: stress test, check feasibility again
 
     # todo: presentation: ideal scenario (good distribution
     # todo: presentation: all on the same
