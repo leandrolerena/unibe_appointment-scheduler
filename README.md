@@ -4,6 +4,8 @@ This repository contains a MILP for an appointment scheduler developed for the '
 
 Note that in the source code, the entity for a service is 'Queue'. This is because I want to add some properties of queues to make the time-slot assignments more fair.
 
+**this project uses python 3.11. If you don't have python 3.11 installed, you may want to run it in docker (see at the bottom of this file)**
+
 ## How to use
 
 First, make sure you have a (virtual) environment up and running. Pipenv the preferred way. In this case, just run
@@ -38,9 +40,19 @@ You will get the solution as console output and **plots** (see the `out/` direct
 
 It is also possible to run within docker. However, if you don't map a directory to `out/`, you will not be able to view the plots.
 
+First: Build image
 ```shell
 docker build . -t appointment-scheduler
+```
+
+Then, run either completely isolated
+```shell
 docker run -it --entrypoint bash appointment-scheduler
+```
+
+Or with a directory (here, your current working directory) to the out directory to get the plots
+```shell
+docker run -it --entrypoint bash -v ${PWD}:/app/out/ appointment-scheduler
 ```
 
 ### Create/Update requirements.txt 
