@@ -15,17 +15,17 @@ UserPreferences = tuple[TimePreferences, Gamma]
 
 
 class AppointmentMultiStation(AppointmentProblem):
-    def __init__(self, problem_data: ProblemData, transitivity_elimination=False):
+    def __init__(self, problem_data: ProblemData):
         self.users: List[User] = problem_data.users
         self.queues: List[Queue] = problem_data.queues
         self.problem_data = problem_data
 
-        self.transitivity_elimination = transitivity_elimination
-        # TODO: add queue opening time
-
     def compile_and_solve(self) -> cp.Problem:
         print("Constraints calculation")
-        M = 19 * 60
+        # TODO: This can be fine-tuned (user a M per queue which corresponds to e.g. closing time. at the moment, we use
+        # a sufficiently high number to deactivate the constraints
+
+        M = 1000
 
         start = time.time()
         # variables
@@ -36,10 +36,10 @@ class AppointmentMultiStation(AppointmentProblem):
         s_per_queue = [cp.Variable(len(queue.requests)) for queue in self.queues]
 
         spots_after_opening = [s_per_queue[k][0] >= self.queues[k].opening for k in
-                             range(len(self.queues))]
+                               range(len(self.queues))]
 
         spots_before_closing = [s_per_queue[k][-1] + self.queues[k].time_serving <= self.queues[k].closing for k in
-                               range(len(self.queues))]
+                                range(len(self.queues))]
         # constraints
         no_queue_overlaps = [s_per_queue[k][j] + self.queues[k].time_serving <= s_per_queue[k][j + 1] for k in
                              range(len(self.queues)) for j in range(len(self.queues[k].requests) - 1)]
@@ -51,7 +51,6 @@ class AppointmentMultiStation(AppointmentProblem):
                 if queue.index == queue_prime.index:
                     continue
 
-                # todo: which users are in both queues
                 for user in self.users:
                     if user.queue_index.get(queue.index) is not None and user.queue_index.get(
                             queue_prime.index) is not None:
@@ -78,12 +77,13 @@ class AppointmentMultiStation(AppointmentProblem):
                       for k_prime in range(len(self.users[i].requests))
                       if k != k_prime]
 
-        # b_transitivity = [b_per_user[i][a][b] + b_per_user[i][b][c] - 1 <=  b_per_user[i][a][c]
-        #                   for i in range(N)
-        #                   for a in range(K)
-        #                   for b in range(K)
-        #                   for c in range(K)
-        #                   if a != b and b != c]
+        b_transitivity = [b_per_user[i][a][b] + b_per_user[i][b][c] - 1 <= b_per_user[i][a][c]
+                          for i in range(len(self.users))
+                          for a in range(len(self.users[i].requests))
+                          for b in range(len(self.users[i].requests))
+                          for c in range(len(self.users[i].requests))
+                          if len(self.users[i].requests) >= 3
+                          if (a < b < c)]
 
         b_diagonal = [b_per_user[i][k][k] == 0
                       for i in range(len(self.users))
@@ -101,14 +101,16 @@ class AppointmentMultiStation(AppointmentProblem):
         c_positive = [c >= np.zeros(c.shape) for c in c_per_queue]
 
         c_penalty_to_early = [
-            c_per_queue[k][i][j] >= self.queues[k].requests[i].earliest - s_per_queue[k][j] - M * (1 - x_per_queue[k][i][j])
+            c_per_queue[k][i][j] >= self.queues[k].requests[i].earliest - s_per_queue[k][j] - M * (
+                        1 - x_per_queue[k][i][j])
             for k in range(len(self.queues))
             for i in range(len(self.queues[k].requests))
             for j in range(len(self.queues[k].requests))
         ]
 
         c_penalty_to_late = [
-            c_per_queue[k][i][j] >= s_per_queue[k][j] + self.queues[k].time_serving - self.queues[k].requests[i].latest - M * (
+            c_per_queue[k][i][j] >= s_per_queue[k][j] + self.queues[k].time_serving - self.queues[k].requests[
+                i].latest - M * (
                     1 - x_per_queue[k][i][j])
             for k in range(len(self.queues))
             for i in range(len(self.queues[k].requests))
@@ -123,9 +125,7 @@ class AppointmentMultiStation(AppointmentProblem):
         constraints.extend(no_queue_overlaps)
         constraints.extend(no_cross_queue_overlaps)
         constraints.extend(b_symmetry)
-        if self.transitivity_elimination:
-            pass
-            # constraints.extend(b_transitivity)
+        constraints.extend(b_transitivity)
         constraints.extend(b_diagonal)
         constraints.extend(one_user_per_spot_in_queue)
         constraints.extend(user_enqueued_once_in_queue)
@@ -163,8 +163,4 @@ class AppointmentMultiStation(AppointmentProblem):
         print(f"Total time used: {end - start} seconds")
         self.problem_data.solution_time = end - start
         self.problem_data.solution_cost = prob.value
-
-        # TODO: Put results in queue about ordering
-        # TODO: Put cost to user
-
         return prob

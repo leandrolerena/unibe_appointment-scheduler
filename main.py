@@ -1,15 +1,11 @@
 import os
 from typing import List
 
-import cvxpy as cp
-import numpy as np
-
 from entities.problem_data import ProblemData
 from entities.requesting import Queue, QueueRequest, User
 from plotting.plot_queue_perspective import PlotQueuePerspective
 from plotting.plot_user_perspective import PlotUserPerspective
 from problems.appointment_multistation import AppointmentMultiStation
-from problems.highs_test import HighsTest
 
 if __name__ == '__main__':
     queues: List[Queue] = [Queue.random() for i in range(5)]
@@ -41,22 +37,12 @@ if __name__ == '__main__':
     except Exception as e:
         print("Could not create plots")
 
-    problem_data.gen_code()
+    # if you want to replay the scenario (and change it), you can print the code used for it
+    # (this is why we don't just pickle)
+    # problem_data.gen_code()
 
     if problem_data.check_feasibility() == True:
         print("Additional Feasibility Check passed")
     else:
         raise Exception("Problem is not feasible")
 
-    # todo: presentation: ideal scenario (good distribution
-    # todo: presentation: all on the same
-
-    # todo: queue -> "appointment scheduling"
-    # todo: overall setting, but in programm we can prune a lot of constraints
-
-    # todo: for non-zero energy, search goes on -> no high config...
-    # todo: for zero energy, the problem is **much** faster
-
-    # todo: next steps
-
-    # had 4 seconds for 35 users on 5 queues
