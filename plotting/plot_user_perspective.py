@@ -41,6 +41,7 @@ class PlotUserPerspective:
                                 facecolors=(colors[request.queue_index]))
 
         plt.savefig(f"{out_dir}/user_perspective.png")
+        print(f"saved plot to {out_dir}/user_perspective.png")
 
 
 def rgb_to_hex(r, g, b):
