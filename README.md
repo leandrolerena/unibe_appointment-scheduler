@@ -34,6 +34,15 @@ You will get the solution as console output and **plots** (see the `out/` direct
 
 ## Misc
 
+### Run within docker
+
+It is also possible to run within docker. However, if you don't map a directory to `out/`, you will not be able to view the plots.
+
+```shell
+docker build . -t appointment-scheduler
+docker run -it --entrypoint bash appointment-scheduler
+```
+
 ### Create/Update requirements.txt 
 
 Pipenv is used for managing dependencies. However, we can extract a requirements.txt file for users who would like to use another environment.
