@@ -1,5 +1,5 @@
 import random
-from typing import Self, List, Mapping, Dict
+from typing import Self, List, Dict
 
 MAX_INT = 2 ** 32 - 1
 

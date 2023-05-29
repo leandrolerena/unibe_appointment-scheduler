@@ -1,7 +1,6 @@
-import math
 from typing import List
 
-from entities.requesting import Queue, User, QueueRequest
+from entities.requesting import Queue, User
 
 
 class ProblemData:
@@ -50,7 +49,6 @@ class ProblemData:
         for user in self.users:
             for request in user.requests:
                 request.queue.user_index[user.index] = request.index_on_user
-
 
     def gen_code(self):
         print("Code for the scenario")
