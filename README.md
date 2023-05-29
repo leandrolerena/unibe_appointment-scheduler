@@ -2,6 +2,8 @@
 
 This repository contains a MILP for an appointment scheduler developed for the 'seminar applied optimization' at University of Bern. 
 
+Note that in the source code, the entity for a service is 'Queue'. This is because I want to add some properties of queues to make the time-slot assignments more fair.
+
 ## How to use
 
 First, make sure you have a (virtual) environment up and running. Pipenv the preferred way. In this case, just run
