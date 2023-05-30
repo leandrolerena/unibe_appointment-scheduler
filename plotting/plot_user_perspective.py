@@ -37,8 +37,12 @@ class PlotUserPerspective:
         for user in self.problem_data.users:
             for request in user.requests:
                 gnt.broken_barh([(request.optimal_visiting_time, request.visiting_duration)],
-                                (10 * user.index, 9),
+                                (10 * user.index + 3, 6),
                                 facecolors=(colors[request.queue_index]))
+
+            # this adds visual indication for users earliest and latest
+            e = 5 if user.latest - user.earliest < 5 else 0
+            gnt.broken_barh([(user.earliest - e, user.latest - user.earliest + e)], (10*user.index + 1, 1), facecolors=('black'))
 
         plt.savefig(f"{out_dir}/user_perspective.png")
         print(f"saved plot to {out_dir}/user_perspective.png")
