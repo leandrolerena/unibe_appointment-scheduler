@@ -25,7 +25,7 @@ class PlotQueuePerspective:
 
         # Setting labels for x-axis and y-axis
         gnt.set_xlabel('Time')
-        gnt.set_ylabel('Queue')
+        gnt.set_ylabel('Service')
 
         # Setting ticks on y-axis
         gnt.set_yticks([10 * queue.index + 10 for queue in self.problem_data.queues])
