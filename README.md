@@ -4,6 +4,8 @@ This repository contains a MILP for an appointment scheduler developed for the '
 
 Note that in the source code, the entity for a service is 'Queue'. This is because I want to add some properties of queues to make the time-slot assignments more fair.
 
+You can find more details in the [presentation file](presentation.pdf).
+
 **this project uses python 3.11. If you don't have python 3.11 installed, you may want to run it in docker (see at the bottom of this file)**
 
 ## How to use
