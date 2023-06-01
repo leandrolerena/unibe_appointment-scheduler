@@ -15,6 +15,9 @@ UserPreferences = tuple[TimePreferences, Gamma]
 
 
 class AppointmentMultiStation(AppointmentProblem):
+    """
+    Problem formulation for the appointment multi-stations (=services) problem
+    """
     def __init__(self, problem_data: ProblemData):
         self.users: List[User] = problem_data.users
         self.queues: List[Queue] = problem_data.queues
@@ -22,12 +25,13 @@ class AppointmentMultiStation(AppointmentProblem):
 
     def compile_and_solve(self) -> cp.Problem:
         print("Constraints calculation")
-        # TODO: This can be fine-tuned (user a M per queue which corresponds to e.g. closing time. at the moment, we use
-        # a sufficiently high number to deactivate the constraints
 
+        # a sufficiently high number to deactivate the constraints, at the moment set to the ending time
+        # this is a bit dirty sorry
         M = 1000
 
         start = time.time()
+
         # variables
         c_per_queue = [cp.Variable([len(queue.requests), len(queue.requests)]) for queue in self.queues]
         x_per_queue = [cp.Variable([len(queue.requests), len(queue.requests)], boolean=True) for queue in self.queues]
@@ -35,16 +39,21 @@ class AppointmentMultiStation(AppointmentProblem):
 
         s_per_queue = [cp.Variable(len(queue.requests)) for queue in self.queues]
 
+        # constraints
         spots_after_opening = [s_per_queue[k][0] >= self.queues[k].opening for k in
                                range(len(self.queues))]
 
         spots_before_closing = [s_per_queue[k][-1] + self.queues[k].time_serving <= self.queues[k].closing for k in
                                 range(len(self.queues))]
-        # constraints
+
         no_queue_overlaps = [s_per_queue[k][j] + self.queues[k].time_serving <= s_per_queue[k][j + 1] for k in
                              range(len(self.queues)) for j in range(len(self.queues[k].requests) - 1)]
 
         no_cross_queue_overlaps = []
+
+        # here we generate no-cross-queue-overlap constraints according to the specification (see slides)
+        # we add only the necessary constraints (meaning we do not add the constraints which are always deactivated
+        # by the big-M method
 
         for queue in self.queues:
             for queue_prime in self.queues:
@@ -54,9 +63,10 @@ class AppointmentMultiStation(AppointmentProblem):
                 for user in self.users:
                     if user.queue_index.get(queue.index) is not None and user.queue_index.get(
                             queue_prime.index) is not None:
-                        # here we know that user is in both queues
+                        # here we know that user is in both queues, so proceed
                         for j_in_queue in range(len(queue.requests)):
                             for j_in_queue_prime in range(len(queue_prime.requests)):
+                                # so add the constraints
                                 no_cross_queue_overlaps.append(s_per_queue[queue.index][j_in_queue] + queue.time_serving
                                                                <= s_per_queue[queue_prime.index][j_in_queue_prime]
                                                                + M * (3 - x_per_queue[queue.index][
@@ -71,12 +81,14 @@ class AppointmentMultiStation(AppointmentProblem):
 
                                                                )
 
+        # Symmetry constraint for the b-variables
         b_symmetry = [b_per_user[i][k][k_prime] == 1 - b_per_user[i][k_prime][k]
                       for i in range(len(self.users))
                       for k in range(len(self.users[i].requests))
                       for k_prime in range(len(self.users[i].requests))
                       if k != k_prime]
 
+        # Transitivity constraint for the b-variables
         b_transitivity = [b_per_user[i][a][b] + b_per_user[i][b][c] - 1 <= b_per_user[i][a][c]
                           for i in range(len(self.users))
                           for a in range(len(self.users[i].requests))
@@ -85,10 +97,12 @@ class AppointmentMultiStation(AppointmentProblem):
                           if len(self.users[i].requests) >= 3
                           if (a < b < c)]
 
+        # The "diagonal" of the b-variables: k comes before k is always false
         b_diagonal = [b_per_user[i][k][k] == 0
                       for i in range(len(self.users))
                       for k in range(len(self.users[i].requests))]
 
+        # the two constraints from the assignment problem
         one_user_per_spot_in_queue = [cp.sum([x_per_queue[k][i][j] for i in range(len(self.queues[k].requests))]) == 1
                                       for k in range(len(self.queues))
                                       for j in range(len(self.queues[k].requests))]
@@ -98,6 +112,7 @@ class AppointmentMultiStation(AppointmentProblem):
                                        for i in range(len(self.queues[k].requests))
                                        ]
 
+        # Cost definition (positive, deadzone)
         c_positive = [c >= np.zeros(c.shape) for c in c_per_queue]
 
         c_penalty_to_early = [
@@ -148,6 +163,7 @@ class AppointmentMultiStation(AppointmentProblem):
 
         end = time.time()
 
+        # Parse the results and put back to problem_data
         for k in range(len(self.queues)):
             queue = self.queues[k]
             for i in range(len(queue.requests)):

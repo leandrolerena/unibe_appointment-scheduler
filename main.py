@@ -8,6 +8,9 @@ from plotting.plot_user_perspective import PlotUserPerspective
 from problems.appointment_multistation import AppointmentMultiStation
 
 if __name__ == '__main__':
+
+    # This generates a random scenario with earliest/latest set to the same value. Check the
+    # corresponding random() functions if you want to tweak it
     queues: List[Queue] = [Queue.random() for i in range(5)]
     users: List[User] = [User.random() for i in range(21)]
 
@@ -19,9 +22,11 @@ if __name__ == '__main__':
             if i % 4 == 0:
                 req = QueueRequest(user, queue)
 
+    # Compile problem data (e.g. remove users which did not request any service)
     problem_data = ProblemData(queues, users, "Test")
     problem_data.process()
 
+    # Solve the problem, the results will be stored in the problem_data
     problem = AppointmentMultiStation(problem_data)
     problem.compile_and_solve()
 
